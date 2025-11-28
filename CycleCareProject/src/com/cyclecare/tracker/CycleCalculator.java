@@ -8,16 +8,16 @@ import java.util.List;
 public class CycleCalculator {
 
     private List<LocalDate> periodHistory;
-    private int averageCycleLength;
+    private int avgCycleLength;
 
     // Constructor
     public CycleCalculator(List<LocalDate> periodHistory) {
         this.periodHistory = periodHistory;
-        this.averageCycleLength = calculateAverage();
+        this.avgCycleLength = calculateAverage();
     }
 
     public int getAverageCycleLength() {
-        return averageCycleLength;
+        return avgCycleLength;
     }
 
     public List<LocalDate> getPeriodHistory() {
@@ -26,7 +26,7 @@ public class CycleCalculator {
 
     public void setPeriodHistory(List<LocalDate> periodHistory) {
         this.periodHistory = periodHistory;
-        this.averageCycleLength = calculateAverage();
+        this.avgCycleLength = calculateAverage();
     }
 
     //calculating Average cycle length from all past cycles
