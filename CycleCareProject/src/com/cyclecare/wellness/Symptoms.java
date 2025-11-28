@@ -21,4 +21,5 @@ public class Symptoms {
         return name + "(Severity: " + severity + ")";
     }
 
+
 }
