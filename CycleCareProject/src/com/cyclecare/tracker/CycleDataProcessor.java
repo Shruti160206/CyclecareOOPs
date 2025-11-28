@@ -1,6 +1,6 @@
 package com.cyclecare.tracker;
 
-import exception.InvalidCycleDataException;
+import exceptions.InvalidCycleDataException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
