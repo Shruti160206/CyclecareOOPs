@@ -1,120 +1,105 @@
 package com.cyclecare.tracker;
 
-import exception.InvalidCycleDataException;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
-// Child class extending parent CycleCalculator
 public class CycleDataProcessor extends CycleCalculator {
 
-    private List<LocalDate> periodDates = new ArrayList<>();
-    private double regularityScore = 0;
-
-    // Constructor: child passes the list to parent
-    public CycleDataProcessor(List<LocalDate> history) {
+    public CycleDataProcessor(List<LocalDate> history) throws InvalidCycleDataException {
         super(history);
-        this.periodDates = history;
+        validateData(history);   // may throw custom exception
     }
 
-
-    //Adding a new period date
-    public void addPeriodDate(LocalDate date) throws InvalidCycleDataException {
-        if (date == null) {
-            throw new InvalidCycleDataException("Date cannot be null.");
+    // -----------------------------
+    //  Exception Validation Method
+    // -----------------------------
+    private void validateData(List<LocalDate> history) throws InvalidCycleDataException {
+        if (history == null || history.isEmpty()) {
+            throw new InvalidCycleDataException("Period history cannot be empty.");
         }
-        periodDates.add(date);
-        setPeriodHistory(periodDates);   // update parent class
+        if (history.size() == 1) {
+            throw new InvalidCycleDataException("At least two dates are required.");
+        }
+
+        // check increasing order
+        for (int i = 0; i < history.size() - 1; i++) {
+            if (history.get(i + 1).isBefore(history.get(i))) {
+                throw new InvalidCycleDataException("Dates must be in chronological order.");
+            }
+        }
     }
 
-
-    //CALCULATE AVERAGE CYCLE LENGTH (using parent method)
-
-    public void calculateAverageLength() {
+    // -----------------------------
+    // Polymorphism: Overriding Parent Method
+    // -----------------------------
+    @Override
+    public LocalDate estimateNextPeriod() {
         try {
-            if (periodDates.size() < 2) {
-                throw new InvalidCycleDataException("At least 2 dates are required.");
-            }
+            // re-validate before prediction
+            validateData(getPeriodHistory());
 
-            int avg = getAverageCycleLength();
-            System.out.println("Average Cycle Length: " + avg);
+            // parent class logic reused
+            return super.estimateNextPeriod();
 
-        } catch (InvalidCycleDataException ex) {
-            System.out.println("Error: " + ex.getMessage());
+        } catch (InvalidCycleDataException e) {
+            System.out.println("Error while estimating next period: " + e.getMessage());
+            return null; // safe fallback
         }
     }
 
-    // ESTIMATE NEXT PERIOD
-    public void estimateNextPeriod() {
+    // -----------------------------
+    // Extra Analytics
+    // -----------------------------
+    public double getAverageDifference() {
+        int[] diffs = getAllCycleDifferences();
+
         try {
-            if (periodDates.isEmpty()) {
-                throw new InvalidCycleDataException("No period data available.");
+            if (diffs.length == 0) {
+                throw new InvalidCycleDataException("Not enough data to compute average.");
             }
+            return computeAverage(diffs);
 
-            LocalDate next = periodEstimator();   // parent method
-            System.out.println("Next Estimated Period: " + next);
-
-        } catch (InvalidCycleDataException ex) {
-            System.out.println("Error: " + ex.getMessage());
+        } catch (InvalidCycleDataException e) {
+            System.out.println("Average calculation failed: " + e.getMessage());
+            return 0;
         }
     }
 
+    public double getVariance() {
+        int[] diffs = getAllCycleDifferences();
 
-    //CALCULATE REGULARITY SCORE
-
-    public void calculateCycleRegularity() {
         try {
-            if (periodDates.size() < 3) {
-                regularityScore = 1.0;    // assume perfect regularity
-                System.out.println("Regularity Score: " + regularityScore);
-                return;
+            if (diffs.length == 0) {
+                throw new InvalidCycleDataException("Not enough data to compute variance.");
             }
 
-            List<Integer> lengths = new ArrayList<>();
+            double mean = computeAverage(diffs);
+            return computeVariance(diffs, mean);
 
-            for (int i = 0; i < periodDates.size() - 1; i++) {
-                int diff = (int) ChronoUnit.DAYS.between(periodDates.get(i), periodDates.get(i + 1));
-
-                if (diff <= 0) {
-                    throw new InvalidCycleDataException("Cycle length must be positive.");
-                }
-
-                lengths.add(diff);
-            }
-
-            double avg = checkAverage(lengths);
-            double var = checkVariance(lengths, avg);
-
-            regularityScore = 1 / (1 + var);
-            System.out.println("Regularity Score: " + regularityScore);
-
-        } catch (InvalidCycleDataException ex) {
-            System.out.println("Error: " + ex.getMessage());
+        } catch (InvalidCycleDataException e) {
+            System.out.println("Variance calculation failed: " + e.getMessage());
+            return 0;
         }
     }
-    //Calculate avg and use our custom excpetion
 
-    private double checkAverage(List<Integer> values) throws InvalidCycleDataException {
-        if (values.isEmpty()) {
-            throw new InvalidCycleDataException("Cannot compute average of empty list.");
+    // -----------------------------
+    // Simplified Calculation Methods
+    // -----------------------------
+    private double computeAverage(int[] values) throws InvalidCycleDataException {
+        if (values.length == 0) {
+            throw new InvalidCycleDataException("Cannot compute average of empty array.");
         }
         double sum = 0;
         for (int v : values) sum += v;
-        return sum / values.size();
+        return sum / values.length;
     }
 
-
-    //Check Variance
-    private double checkVariance(List<Integer> values, double mean) throws InvalidCycleDataException {
-        if (values.isEmpty()) {
-            throw new InvalidCycleDataException("Cannot compute variance of empty list.");
+    private double computeVariance(int[] values, double mean) throws InvalidCycleDataException {
+        if (values.length == 0) {
+            throw new InvalidCycleDataException("Cannot compute variance of empty array.");
         }
         double sumSq = 0;
-        for (int v : values) {
-            double d = v - mean;
-            sumSq += d * d;
-        }
-        return sumSq / values.size();   // population variance
+        for (int v : values) sumSq += Math.pow(v - mean, 2);
+        return sumSq / values.length;
     }
 }
