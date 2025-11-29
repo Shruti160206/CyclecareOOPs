@@ -1,7 +1,8 @@
-package com.cyclecare.exceptions;
+package com.cyclecare.tracker;
 
-public class InvalidCycleDataException extends RuntimeException {
-    public InvalidCycleDataException(String msg) {
-        super(msg);
+public class InvalidCycleDataException extends Exception {
+    public InvalidCycleDataException(String message) {
+        super(message);
     }
 }
+
