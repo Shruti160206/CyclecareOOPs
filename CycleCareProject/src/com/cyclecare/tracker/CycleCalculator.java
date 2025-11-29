@@ -1,19 +1,16 @@
 package com.cyclecare.tracker;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-@SuppressWarnings({"unused", "MismatchedQueryAndUpdateOfCollection"})
+@SuppressWarnings("unused")
 public class CycleCalculator {
 
     private List<LocalDate> periodHistory;
     private int avgCycleLength;
 
-    // Constructor
     public CycleCalculator(List<LocalDate> periodHistory) {
-        this.periodHistory = periodHistory;
-        this.avgCycleLength = calculateAverage();
+        setPeriodHistory(periodHistory);
     }
 
     public int getAverageCycleLength() {
@@ -29,48 +26,46 @@ public class CycleCalculator {
         this.avgCycleLength = calculateAverage();
     }
 
-    //calculating Average cycle length from all past cycles
+    // Calculate average cycle length safely
     private int calculateAverage() {
         if (periodHistory == null || periodHistory.size() < 2) {
-            return 28; // default
+            return 28; // Default fallback
         }
 
         long totalDays = 0;
         for (int i = 0; i < periodHistory.size() - 1; i++) {
-            long diff = ChronoUnit.DAYS.between(periodHistory.get(i), periodHistory.get(i + 1));
-            totalDays += diff;
+            totalDays += getDaysBetween(periodHistory.get(i), periodHistory.get(i + 1));
         }
 
         return (int) (totalDays / (periodHistory.size() - 1));
     }
 
-    //estimating next period
-    public LocalDate periodEstimator() {
+    // Predict the next expected period date
+    public LocalDate estimateNextPeriod() {
         if (periodHistory == null || periodHistory.isEmpty()) {
             return null;
         }
 
-        LocalDate last = periodHistory.getLast(); // keep your version
-        int avg = getAverageCycleLength();
-        return last.plusDays(avg);
+        LocalDate lastDate = periodHistory.getLast();
+        return lastDate.plusDays(avgCycleLength);
     }
 
-    //calculating all cycle lengths
+    // Return all cycle differences as an int array
     public int[] getAllCycleDifferences() {
         if (periodHistory == null || periodHistory.size() < 2) {
-            return new int[]{};
+            return new int[] {};
         }
 
-        int[] lengths = new int[periodHistory.size() - 1];
+        int[] differences = new int[periodHistory.size() - 1];
         for (int i = 0; i < periodHistory.size() - 1; i++) {
-            lengths[i] = (int) ChronoUnit.DAYS.between(periodHistory.get(i), periodHistory.get(i + 1));
+            differences[i] = (int) getDaysBetween(periodHistory.get(i), periodHistory.get(i + 1));
         }
-        return lengths;
+
+        return differences;
     }
 
-    // Exception class
-    public static class InvalidCycleValueException extends Exception {
-        public InvalidCycleValueException(String message) { super(message); }
-        public InvalidCycleValueException() { super("Invalid cycle value provided."); }
+    // Custom method to calculate days between two dates
+    private long getDaysBetween(LocalDate start, LocalDate end) {
+        return end.toEpochDay() - start.toEpochDay();
     }
 }
