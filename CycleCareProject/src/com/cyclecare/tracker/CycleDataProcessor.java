@@ -11,9 +11,7 @@ public class CycleDataProcessor extends CycleCalculator {
         validateData(history);   // may throw custom exception
     }
 
-    // -----------------------------
-    //  Exception Validation Method
-    // -----------------------------
+    //Using the custom-made Exception from the exceptions package
     private void validateData(List<LocalDate> history) throws InvalidCycleDataException {
         if (history == null || history.isEmpty()) {
             throw new InvalidCycleDataException("Period history cannot be empty.");
@@ -30,9 +28,9 @@ public class CycleDataProcessor extends CycleCalculator {
         }
     }
 
-    // -----------------------------
-    // Polymorphism: Overriding Parent Method
-    // -----------------------------
+
+    //Polymorphism method: overriding the parent class CycleCalculator
+
     @Override
     public LocalDate estimateNextPeriod() {
         try {
@@ -44,13 +42,13 @@ public class CycleDataProcessor extends CycleCalculator {
 
         } catch (InvalidCycleDataException e) {
             System.out.println("Error while estimating next period: " + e.getMessage());
-            return null; // safe fallback
+            return null;
         }
     }
 
-    // -----------------------------
-    // Extra Analytics
-    // -----------------------------
+
+    //Average calculation
+
     public double getAverageDifference() {
         int[] diffs = getAllCycleDifferences();
 
@@ -83,9 +81,8 @@ public class CycleDataProcessor extends CycleCalculator {
         }
     }
 
-    // -----------------------------
-    // Simplified Calculation Methods
-    // -----------------------------
+
+
     private double computeAverage(int[] values) throws InvalidCycleDataException {
         if (values.length == 0) {
             throw new InvalidCycleDataException("Cannot compute average of empty array.");
