@@ -2,6 +2,7 @@ package com.cyclecare.tracker;
 
 import java.time.LocalDate;
 import java.util.List;
+import com.cyclecare.exceptions.InvalidCycleDataException;
 
 public class CycleDataProcessor extends CycleCalculator {
 
