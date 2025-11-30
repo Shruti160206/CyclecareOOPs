@@ -1,3 +1,4 @@
+package com.cyclecare.tracker;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -70,6 +71,6 @@ public class MyCyclePhase {
             System.out.println("Invalid input. Please enter a whole number.");
         } catch (InvalidCycleDayException e) {
             System.out.println("Error: " + e.getMessage());
-        } 
+        }
     }
 }
