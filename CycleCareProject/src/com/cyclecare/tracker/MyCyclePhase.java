@@ -1,19 +1,9 @@
 package com.cyclecare.tracker;
+import com.cyclecare.exceptions.InvalidCycleDayException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
-
-
-class InvalidCycleDayException extends Exception {
-    public InvalidCycleDayException(String message) {
-        super(message);
-    }
-}
-
-
 public class MyCyclePhase {
-
     private int cycleLength = 28;
 
     public MyCyclePhase() {
@@ -56,7 +46,7 @@ public class MyCyclePhase {
         }
     }
 
-    public static void main(String[] args) {
+    public void displaycyclephase() {
         Scanner scanner = new Scanner(System.in);
         MyCyclePhase myCyclePhase = new MyCyclePhase(); // default 28 days
 
@@ -66,7 +56,6 @@ public class MyCyclePhase {
 
             String phase = myCyclePhase.detectPhase(dayInCycle);
             System.out.println("You are currently in: " + phase);
-
         } catch (InputMismatchException ime) {
             System.out.println("Invalid input. Please enter a whole number.");
         } catch (InvalidCycleDayException e) {
@@ -74,3 +63,5 @@ public class MyCyclePhase {
         }
     }
 }
+
+
