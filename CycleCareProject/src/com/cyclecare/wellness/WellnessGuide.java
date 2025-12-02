@@ -1,10 +1,8 @@
 package com.cyclecare.wellness;
 import java.util.ArrayList;
 public class WellnessGuide implements Advisor {
-
     private final MoodMonitor moodMonitor;
     private final SymptomMonitor symptomMonitor;
-
     // Stores final advice lines
     private final ArrayList<String> adviceList = new ArrayList<>();
     public WellnessGuide(MoodMonitor moodMonitor, SymptomMonitor symptomMonitor) {
@@ -50,7 +48,6 @@ public class WellnessGuide implements Advisor {
             moodAdvice.add("Mood Advice: Mood information is unclear.");
             return moodAdvice;
         }
-
         switch (mood.toLowerCase()) {
             case "happy":
                 moodAdvice.add("Mood Advice: You seem happy! Keep doing activities you enjoy.");
@@ -73,9 +70,7 @@ public class WellnessGuide implements Advisor {
 
         return moodAdvice;
     }
-
     // SYMPTOM ANALYSIS
-
     private ArrayList<String> analyzeSymptoms() {
         ArrayList<String> symptomAdvice = new ArrayList<>();
 
