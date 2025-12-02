@@ -61,7 +61,11 @@ public class MyCyclePhase {
         } catch (InvalidCycleDayException e) {
             System.out.println("Error: " + e.getMessage());
         }
+
+        MyCyclePhase phaseTool = new MyCyclePhase();
+        phaseTool.displaycyclephase();
     }
 }
+
 
 
