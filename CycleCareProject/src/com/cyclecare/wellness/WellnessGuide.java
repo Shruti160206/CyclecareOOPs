@@ -116,7 +116,6 @@ public class WellnessGuide implements Advisor {
                 symptomAdvice.add("• Acne Tip: Use gentle skincare and avoid touching your face.");
             }
         });
-
         return symptomAdvice;
     }
 }
