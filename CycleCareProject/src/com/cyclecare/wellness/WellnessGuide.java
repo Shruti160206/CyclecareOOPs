@@ -1,10 +1,9 @@
 package com.cyclecare.wellness;
 import java.util.ArrayList;
-public class WellnessGuide implements Advisor {
+public class WellnessGuide {
     private final MoodMonitor moodMonitor;
     private final SymptomMonitor symptomMonitor;
-    // Stores final advice lines
-    private final ArrayList<String> adviceList = new ArrayList<>();
+    // Constructor – ensures monitors are not null
     public WellnessGuide(MoodMonitor moodMonitor, SymptomMonitor symptomMonitor) {
         if (moodMonitor == null || symptomMonitor == null) {
             throw new IllegalArgumentException("Monitors cannot be null.");
@@ -12,26 +11,25 @@ public class WellnessGuide implements Advisor {
         this.moodMonitor = moodMonitor;
         this.symptomMonitor = symptomMonitor;
     }
-    @Override
+
+    //Generates and returns complete wellness advice as one String.
     public String giveAdvice() {
-        // regenerate advice lines
-        ArrayList<String> lines = getAdviceLines();
         StringBuilder sb = new StringBuilder();
         sb.append("\n--- Wellness Advice ---\n");
-        for (String tip : lines) {
+
+        // Add mood tips
+        for (String tip : analyzeMood()) {
+            sb.append(tip).append("\n");
+        }
+
+        // Add symptom tips
+        for (String tip : analyzeSymptoms()) {
             sb.append(tip).append("\n");
         }
         sb.append("\nNote: This advice is general and not medical guidance.\n");
         return sb.toString();
     }
-    public ArrayList<String> getAdviceLines() {
-        adviceList.clear(); // remove old advice
-        // Collect advice
-        adviceList.addAll(analyzeMood());
-        adviceList.addAll(analyzeSymptoms());
-        return new ArrayList<>(adviceList);
-    }
-    // MOOD ANALYSIS
+    //MOOD ANALYSIS
     private ArrayList<String> analyzeMood() {
         ArrayList<String> moodAdvice = new ArrayList<>();
 
@@ -39,7 +37,7 @@ public class WellnessGuide implements Advisor {
             moodAdvice.add("Mood Advice: No mood data recorded.");
             return moodAdvice;
         }
-        // Get latest mood
+        // Get last mood entry
         Mood lastMood = moodMonitor.getRecords()
                 .get(moodMonitor.getRecords().size() - 1);
 
@@ -48,6 +46,7 @@ public class WellnessGuide implements Advisor {
             moodAdvice.add("Mood Advice: Mood information is unclear.");
             return moodAdvice;
         }
+
         switch (mood.toLowerCase()) {
             case "happy":
                 moodAdvice.add("Mood Advice: You seem happy! Keep doing activities you enjoy.");
@@ -70,7 +69,7 @@ public class WellnessGuide implements Advisor {
 
         return moodAdvice;
     }
-    // SYMPTOM ANALYSIS
+    //SYMPTOM ANALYSIS
     private ArrayList<String> analyzeSymptoms() {
         ArrayList<String> symptomAdvice = new ArrayList<>();
 
@@ -78,10 +77,8 @@ public class WellnessGuide implements Advisor {
             symptomAdvice.add("Symptom Advice: No symptoms recorded.");
             return symptomAdvice;
         }
-
-        // Severity-based general advice
+        // General severity-based advice
         double avg = symptomMonitor.calculateAverageSeverity();
-
         if (avg >= 7) {
             symptomAdvice.add("Symptom Advice: Symptoms are severe. Consider resting more or consulting a doctor.");
         } else if (avg >= 4) {
@@ -89,8 +86,7 @@ public class WellnessGuide implements Advisor {
         } else {
             symptomAdvice.add("Symptom Advice: Mild symptoms. Keep tracking your health.");
         }
-
-        // Specific tips for each of the 7 symptoms
+        // Specific advice for the 7 symptoms
         symptomMonitor.getRecords().forEach(s -> {
             String name = s.getName().toLowerCase();
 
