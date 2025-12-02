@@ -1,1 +1,4 @@
-/.idea/
+# editor directories
+.idea
+# build files
+out
