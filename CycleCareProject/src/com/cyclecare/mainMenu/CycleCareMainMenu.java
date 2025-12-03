@@ -307,7 +307,7 @@ main
         JPanel wellnessPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         JButton showAdviceBtn = new JButton("Show Wellness Advice");
 
-        wellnessPanel.add(new JLabel("Get personalized wellness advice:"));
+        wellnessPanel.add(new JLabel("Get wellness advice:"));
         wellnessPanel.add(showAdviceBtn);
 
         showAdviceBtn.addActionListener(e -> {
