@@ -6,6 +6,7 @@ import com.cyclecare.exceptions.InvalidCycleDataException;
 import com.cyclecare.exceptions.InvalidCycleDayException;
 import com.cyclecare.wellness.Mood;
 import com.cyclecare.wellness.MoodMonitor;
+import com.cyclecare.wellness.Symptoms;
 import com.cyclecare.wellness.SymptomMonitor;
 import com.cyclecare.wellness.WellnessGuide;
 
@@ -18,8 +19,9 @@ import java.util.List;
 
 public class CycleCareMainMenu extends JFrame {
 
-    private JTextField nameField, ageField, periodField, moodField, symptomField, severityField, dayField;
+    private JTextField nameField, ageField, periodField, moodField, symptomField, severityField, cycleDayField;
     private JTextArea outputArea;
+    private JLabel statusLabel;
 
     private String userName;
     private int userAge;
@@ -31,33 +33,33 @@ public class CycleCareMainMenu extends JFrame {
     private SymptomMonitor symptomMonitor = new SymptomMonitor();
 
     public CycleCareMainMenu() {
-
         setTitle("CycleCare");
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Output area
+        // Output Area
         outputArea = new JTextArea();
         outputArea.setEditable(false);
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         JScrollPane scrollPane = new JScrollPane(outputArea);
 
-        Color tabPink = new Color(255, 224, 224); // Soft pink
-        Color buttonPink = new Color(255, 182, 193); // Hot pink
+        Color tabColor = new Color(255, 224, 224); // Soft pink
+        Color buttonColor = new Color(255, 143, 199); // Light blue
 
         JTabbedPane tabs = new JTabbedPane();
 
-        // ==========================================
+        // =========================
         // USER DETAILS TAB
-        // ==========================================
-        JPanel userPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        userPanel.setBackground(tabPink);
+        // =========================
+        JPanel userPanel = new JPanel(new GridLayout(3, 1, 5, 10));
+        userPanel.setBackground(tabColor);
 
         nameField = new JTextField();
         ageField = new JTextField();
+        statusLabel = new JLabel("");
         JButton createUserBtn = new JButton("Create User");
-        createUserBtn.setBackground(buttonPink);
-        JLabel statusLabel = new JLabel("No user created.");
+        createUserBtn.setBackground(buttonColor);
 
         userPanel.add(new JLabel("Name:"));
         userPanel.add(nameField);
@@ -71,13 +73,10 @@ public class CycleCareMainMenu extends JFrame {
             try {
                 int age = Integer.parseInt(ageField.getText().trim());
                 if (name.isEmpty()) throw new Exception();
-
                 userName = name;
                 userAge = age;
-
                 statusLabel.setText("User Created: " + name + " (Age: " + age + ")");
                 outputArea.append("Welcome, " + name + "!\n");
-
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Invalid name or age!", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -85,23 +84,24 @@ public class CycleCareMainMenu extends JFrame {
 
         tabs.addTab("User Details", userPanel);
 
-        // ==========================================
+        // =========================
         // CYCLE TRACKER TAB
-        // ==========================================
+        // =========================
         JPanel cyclePanel = new JPanel(new GridLayout(6, 2, 5, 5));
-        cyclePanel.setBackground(tabPink);
+        cyclePanel.setBackground(tabColor);
 
         periodField = new JTextField();
+        periodField.setColumns(10);
         JButton addPeriodBtn = new JButton("Add Period Date");
-        addPeriodBtn.setBackground(buttonPink);
+        addPeriodBtn.setBackground(buttonColor);
         JButton showAvgBtn = new JButton("Show Average Cycle Length");
-        showAvgBtn.setBackground(buttonPink);
+        showAvgBtn.setBackground(buttonColor);
         JButton showDiffBtn = new JButton("Show Cycle Differences");
-        showDiffBtn.setBackground(buttonPink);
-        JButton showStatsBtn = new JButton("Show Average & Variance");
-        showStatsBtn.setBackground(buttonPink);
+        showDiffBtn.setBackground(buttonColor);
+        JButton showStatsBtn = new JButton("Show Avg & Variance");
+        showStatsBtn.setBackground(buttonColor);
         JButton estimateNextBtn = new JButton("Estimate Next Period");
-        estimateNextBtn.setBackground(buttonPink);
+        estimateNextBtn.setBackground(buttonColor);
 
         cyclePanel.add(new JLabel("Period Date (YYYY-MM-DD):"));
         cyclePanel.add(periodField);
@@ -156,17 +156,18 @@ public class CycleCareMainMenu extends JFrame {
 
         tabs.addTab("Cycle Tracker", cyclePanel);
 
-        // ==========================================
+        // =========================
         // MOOD TRACKER TAB
-        // ==========================================
-        JPanel moodPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        moodPanel.setBackground(tabPink);
+        // =========================
+        JPanel moodPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        moodPanel.setBackground(tabColor);
 
-        moodField = new JTextField(10); // smaller box
+        moodField = new JTextField();
+        moodField.setColumns(10);
         JButton addMoodBtn = new JButton("Add Mood");
-        addMoodBtn.setBackground(buttonPink);
+        addMoodBtn.setBackground(buttonColor);
         JButton showMoodBtn = new JButton("Show Mood Records");
-        showMoodBtn.setBackground(buttonPink);
+        showMoodBtn.setBackground(buttonColor);
 
         moodPanel.add(new JLabel("Mood:"));
         moodPanel.add(moodField);
@@ -183,30 +184,71 @@ public class CycleCareMainMenu extends JFrame {
 
         showMoodBtn.addActionListener(e -> {
             outputArea.append("\nMood Records:\n");
-            for (Mood m : moodMonitor.getRecords()) {
-                outputArea.append(m + "\n");
-            }
+            for (Mood m : moodMonitor.getRecords()) outputArea.append(m + "\n");
         });
 
         tabs.addTab("Mood Tracker", moodPanel);
 
-        // ==========================================
+        // =========================
+        // SYMPTOM TRACKER TAB
+        // =========================
+        JPanel symptomPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+        symptomPanel.setBackground(tabColor);
+
+        symptomField = new JTextField();
+        symptomField.setColumns(10);
+        severityField = new JTextField();
+        severityField.setColumns(5);
+
+        JButton addSymptomBtn = new JButton("Add Symptom");
+        addSymptomBtn.setBackground(buttonColor);
+        JButton showSymptomBtn = new JButton("Show Symptoms");
+        showSymptomBtn.setBackground(buttonColor);
+
+        symptomPanel.add(new JLabel("Symptom:"));
+        symptomPanel.add(symptomField);
+        symptomPanel.add(new JLabel("Severity (1-10):"));
+        symptomPanel.add(severityField);
+        symptomPanel.add(addSymptomBtn);
+        symptomPanel.add(showSymptomBtn);
+
+        addSymptomBtn.addActionListener(e -> {
+            try {
+                String name = symptomField.getText().trim();
+                int severity = Integer.parseInt(severityField.getText().trim());
+                symptomMonitor.addSymptom(name, severity);
+                outputArea.append("Symptom added: " + name + " (Severity: " + severity + ")\n");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid severity!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        showSymptomBtn.addActionListener(e -> {
+            outputArea.append("\nSymptom Records:\n");
+            for (Symptoms s : symptomMonitor.getRecords()) outputArea.append(s + "\n");
+            outputArea.append("Average Severity: " + symptomMonitor.calculateAverageSeverity() + "\n");
+        });
+
+        tabs.addTab("Symptom Tracker", symptomPanel);
+
+        // =========================
         // CYCLE PHASE DETECTOR TAB
-        // ==========================================
+        // =========================
         JPanel phasePanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        phasePanel.setBackground(tabPink);
+        phasePanel.setBackground(tabColor);
 
-        dayField = new JTextField(5); // smaller box for 1-28
+        cycleDayField = new JTextField();
+        cycleDayField.setColumns(10);
         JButton detectPhaseBtn = new JButton("Detect Phase");
-        detectPhaseBtn.setBackground(buttonPink);
+        detectPhaseBtn.setBackground(buttonColor);
 
-        phasePanel.add(new JLabel("Enter Day in Cycle (1-28):"));
-        phasePanel.add(dayField);
+        phasePanel.add(new JLabel("Day in Cycle (1-28):"));
+        phasePanel.add(cycleDayField);
         phasePanel.add(detectPhaseBtn);
 
         detectPhaseBtn.addActionListener(e -> {
             try {
-                int day = Integer.parseInt(dayField.getText().trim());
+                int day = Integer.parseInt(cycleDayField.getText().trim());
                 MyCyclePhase tool = new MyCyclePhase();
                 String phase = tool.detectPhase(day);
                 outputArea.append("Cycle Phase: " + phase + "\n");
@@ -219,22 +261,39 @@ public class CycleCareMainMenu extends JFrame {
 
         tabs.addTab("Cycle Phase", phasePanel);
 
-        // ==========================================
+        // =========================
+        // WELLNESS GUIDE TAB
+        // =========================
+        JPanel wellnessPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        wellnessPanel.setBackground(tabColor);
+
+        JButton showAdviceBtn = new JButton("Show Wellness Advice");
+        showAdviceBtn.setBackground(buttonColor);
+
+        wellnessPanel.add(new JLabel("Get wellness advice:"));
+        wellnessPanel.add(showAdviceBtn);
+
+        showAdviceBtn.addActionListener(e -> {
+            WellnessGuide guide = new WellnessGuide(moodMonitor, symptomMonitor);
+            outputArea.append(guide.giveAdvice() + "\n");
+        });
+
+        tabs.addTab("Wellness Guide", wellnessPanel);
+
+        // =========================
         // CLEAR OUTPUT BUTTON
-        // ==========================================
-        JButton clearBtn = new JButton("Clear Output");
-        clearBtn.setBackground(buttonPink);
-        clearBtn.addActionListener(e -> outputArea.setText(""));
+        // =========================
+        JButton clearOutputBtn = new JButton("Clear Output");
+        clearOutputBtn.setBackground(Color.RED);
+        clearOutputBtn.setForeground(Color.WHITE);
+        clearOutputBtn.addActionListener(e -> outputArea.setText(""));
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(clearBtn);
-
-        // ==========================================
-        // ADD TABS AND OUTPUT AREA
-        // ==========================================
+        // =========================
+        // ADD COMPONENTS
+        // =========================
         add(tabs, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(clearOutputBtn, BorderLayout.SOUTH);
     }
 
     public static void main(String[] args) {
