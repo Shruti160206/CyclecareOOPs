@@ -10,14 +10,17 @@ public class CycleCalculator {
     private int avgCycleLength;
 
     public CycleCalculator(List<LocalDate> periodHistory) {
+
         setPeriodHistory(periodHistory);
     }
 
     public int getAverageCycleLength() {
+
         return avgCycleLength;
     }
 
     public List<LocalDate> getPeriodHistory() {
+
         return periodHistory;
     }
 
@@ -36,7 +39,6 @@ public class CycleCalculator {
         for (int i = 0; i < periodHistory.size() - 1; i++) {
             totalDays += getDaysBetween(periodHistory.get(i), periodHistory.get(i + 1));
         }
-
         return (int) (totalDays / (periodHistory.size() - 1));
     }
 
@@ -45,7 +47,6 @@ public class CycleCalculator {
         if (periodHistory == null || periodHistory.isEmpty()) {
             return null;
         }
-
         LocalDate lastDate = periodHistory.getLast();
         return lastDate.plusDays(avgCycleLength);
     }
@@ -60,7 +61,6 @@ public class CycleCalculator {
         for (int i = 0; i < periodHistory.size() - 1; i++) {
             differences[i] = (int) getDaysBetween(periodHistory.get(i), periodHistory.get(i + 1));
         }
-
         return differences;
     }
 

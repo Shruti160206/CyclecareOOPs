@@ -19,7 +19,8 @@ import java.util.List;
 
 public class CycleCareMainMenu extends JFrame {
 
-    private JTextField nameField, ageField, periodField, moodField, symptomField, severityField, cycleDayField;
+    private JTextField nameField, ageField, periodField, moodField, symptomField, severityField, cycleDayField, heightField, weightField;
+    private double userHeight, userWeight;
     private JTextArea outputArea;
     private JLabel statusLabel;
 
@@ -52,12 +53,15 @@ public class CycleCareMainMenu extends JFrame {
         // =========================
         // USER DETAILS TAB
         // =========================
-        JPanel userPanel = new JPanel(new GridLayout(3, 1, 5, 10));
+        JPanel userPanel = new JPanel(new GridLayout(5, 2, 5, 10)); // increase rows
         userPanel.setBackground(tabColor);
 
         nameField = new JTextField();
         ageField = new JTextField();
+        heightField = new JTextField();
+        weightField = new JTextField();
         statusLabel = new JLabel("");
+
         JButton createUserBtn = new JButton("Create User");
         createUserBtn.setBackground(buttonColor);
 
@@ -65,22 +69,36 @@ public class CycleCareMainMenu extends JFrame {
         userPanel.add(nameField);
         userPanel.add(new JLabel("Age:"));
         userPanel.add(ageField);
+        userPanel.add(new JLabel("Height (cm):"));
+        userPanel.add(heightField);
+        userPanel.add(new JLabel("Weight (kg):"));
+        userPanel.add(weightField);
         userPanel.add(createUserBtn);
         userPanel.add(statusLabel);
+
 
         createUserBtn.addActionListener(e -> {
             String name = nameField.getText().trim();
             try {
                 int age = Integer.parseInt(ageField.getText().trim());
-                if (name.isEmpty()) throw new Exception();
+                double height = Double.parseDouble(heightField.getText().trim());
+                double weight = Double.parseDouble(weightField.getText().trim());
+
+                if (name.isEmpty() || age <= 0 || height <= 0 || weight <= 0) throw new Exception();
+
                 userName = name;
                 userAge = age;
+                userHeight = height;
+                userWeight = weight;
+
                 statusLabel.setText("User Created: " + name + " (Age: " + age + ")");
                 outputArea.append("Welcome, " + name + "!\n");
+                outputArea.append("Height: " + height + " cm, Weight: " + weight + " kg\n");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid name or age!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid input! Please enter valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
 
         tabs.addTab("User Details", userPanel);
 
@@ -162,24 +180,24 @@ public class CycleCareMainMenu extends JFrame {
         JPanel moodPanel = new JPanel(new GridLayout(2, 2, 5, 5));
         moodPanel.setBackground(tabColor);
 
-        moodField = new JTextField();
-        moodField.setColumns(10);
+        // Predefined moods
+        String[] moodsOptions = {"Happy", "Sad", "Stressed", "Angry", "Anxious"};
+        JComboBox<String> moodCombo = new JComboBox<>(moodsOptions);
+
         JButton addMoodBtn = new JButton("Add Mood");
         addMoodBtn.setBackground(buttonColor);
         JButton showMoodBtn = new JButton("Show Mood Records");
         showMoodBtn.setBackground(buttonColor);
 
         moodPanel.add(new JLabel("Mood:"));
-        moodPanel.add(moodField);
+        moodPanel.add(moodCombo);
         moodPanel.add(addMoodBtn);
         moodPanel.add(showMoodBtn);
 
         addMoodBtn.addActionListener(e -> {
-            String mood = moodField.getText().trim();
-            if (!mood.isEmpty()) {
-                moodMonitor.addMood(mood);
-                outputArea.append("Mood added: " + mood + "\n");
-            }
+            String mood = (String) moodCombo.getSelectedItem();
+            moodMonitor.addMood(mood);
+            outputArea.append("Mood added: " + mood + "\n");
         });
 
         showMoodBtn.addActionListener(e -> {
@@ -195,8 +213,10 @@ public class CycleCareMainMenu extends JFrame {
         JPanel symptomPanel = new JPanel(new GridLayout(3, 2, 5, 5));
         symptomPanel.setBackground(tabColor);
 
-        symptomField = new JTextField();
-        symptomField.setColumns(10);
+        // Predefined Symptoms
+        String[] symptomsOptions = {"Cramp", "Bloating", "Back Pain", "Fatigue", "Headache", "Mood Swings", "Acne"};
+        JComboBox<String> symptomCombo = new JComboBox<>(symptomsOptions);
+
         severityField = new JTextField();
         severityField.setColumns(5);
 
@@ -206,7 +226,7 @@ public class CycleCareMainMenu extends JFrame {
         showSymptomBtn.setBackground(buttonColor);
 
         symptomPanel.add(new JLabel("Symptom:"));
-        symptomPanel.add(symptomField);
+        symptomPanel.add(symptomCombo);
         symptomPanel.add(new JLabel("Severity (1-10):"));
         symptomPanel.add(severityField);
         symptomPanel.add(addSymptomBtn);
@@ -214,7 +234,7 @@ public class CycleCareMainMenu extends JFrame {
 
         addSymptomBtn.addActionListener(e -> {
             try {
-                String name = symptomField.getText().trim();
+                String name = (String) symptomCombo.getSelectedItem();
                 int severity = Integer.parseInt(severityField.getText().trim());
                 symptomMonitor.addSymptom(name, severity);
                 outputArea.append("Symptom added: " + name + " (Severity: " + severity + ")\n");
@@ -289,13 +309,36 @@ public class CycleCareMainMenu extends JFrame {
         clearOutputBtn.addActionListener(e -> outputArea.setText(""));
 
         // =========================
-        // ADD COMPONENTS
+        // ADD EXIT/TERMINATE BUTTON
         // =========================
+        JButton exitBtn = new JButton("Exit");
+        exitBtn.setBackground(Color.RED);
+        exitBtn.setForeground(Color.WHITE);
+        exitBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to exit?",
+                    "Confirm Exit",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+
+        // =========================
+        // Add both buttons in a panel
+        // =========================
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        bottomPanel.add(clearOutputBtn);
+        bottomPanel.add(exitBtn);
+
         add(tabs, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-        add(clearOutputBtn, BorderLayout.SOUTH);
+        add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    // =========================
+    // MAIN METHOD
+    // =========================
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new CycleCareMainMenu().setVisible(true));
     }

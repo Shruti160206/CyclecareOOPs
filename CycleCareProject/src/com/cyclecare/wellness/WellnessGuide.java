@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class WellnessGuide {
     private final MoodMonitor moodMonitor;
     private final SymptomMonitor symptomMonitor;
+
     // Constructor – ensures monitors are not null
     public WellnessGuide(MoodMonitor moodMonitor, SymptomMonitor symptomMonitor) {
         if (moodMonitor == null || symptomMonitor == null) {
