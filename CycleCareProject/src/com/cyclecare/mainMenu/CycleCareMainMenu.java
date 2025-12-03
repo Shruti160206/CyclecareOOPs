@@ -25,7 +25,10 @@ public class CycleCareMainMenu extends JFrame {
 
     private List<LocalDate> periodHistory = new ArrayList<>();
     private CycleDataProcessor cycleProcessor;
+ feature1
 
+
+main
     private MoodMonitor moodMonitor = new MoodMonitor();
     private SymptomMonitor symptomMonitor = new SymptomMonitor();
 
@@ -33,14 +36,16 @@ public class CycleCareMainMenu extends JFrame {
 
         setTitle("CycleCare");
         setSize(900, 700);
+        setTitle("CycleCare");
+        setSize(800, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JTabbedPane tabs = new JTabbedPane();
 
-        // ==========================================
         // USER DETAILS TAB
         // ==========================================
+        // ================= User Details Tab =================
         JPanel userPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         nameField = new JTextField();
         ageField = new JTextField();
@@ -165,6 +170,95 @@ public class CycleCareMainMenu extends JFrame {
         showMoodBtn.addActionListener(e -> {
             outputArea.append("\nMood Records:\n");
             moodMonitor.displayRecords();
+                userName = name;
+                userAge = age;
+                statusLabel.setText("User created: " + name + ", Age: " + age);
+                outputArea.append("Welcome, " + name + "!\n");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid name or age!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        tabs.addTab("User Details", userPanel);
+
+        // ================= Cycle Tracker Tab =================
+        JPanel cyclePanel = new JPanel(new GridLayout(6, 2, 5, 5));
+        periodField = new JTextField();
+        JButton addPeriodBtn = new JButton("Add Period Date");
+        JButton showAvgBtn = new JButton("Show Average Cycle Length");
+        JButton showDiffBtn = new JButton("Show Cycle Differences");
+        JButton showStatsBtn = new JButton("Show Average & Variance");
+        JButton estimateNextBtn = new JButton("Estimate Next Period");
+
+        cyclePanel.add(new JLabel("Period Date (YYYY-MM-DD):"));
+        cyclePanel.add(periodField);
+        cyclePanel.add(addPeriodBtn);
+        cyclePanel.add(showAvgBtn);
+        cyclePanel.add(showDiffBtn);
+        cyclePanel.add(showStatsBtn);
+        cyclePanel.add(estimateNextBtn);
+
+        addPeriodBtn.addActionListener(e -> {
+            try {
+                LocalDate date = LocalDate.parse(periodField.getText().trim());
+                periodHistory.add(date);
+                cycleProcessor = new CycleDataProcessor(periodHistory);
+                outputArea.append("Period date added: " + date + "\n");
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid date format!", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (InvalidCycleDataException ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        showAvgBtn.addActionListener(e -> {
+            if (cycleProcessor != null) {
+                outputArea.append("Average Cycle Length: " + cycleProcessor.getAverageCycleLength() + " days\n");
+            } else outputArea.append("Add period dates first.\n");
+        });
+
+        showDiffBtn.addActionListener(e -> {
+            if (cycleProcessor != null) {
+                int[] diffs = cycleProcessor.getAllCycleDifferences();
+                outputArea.append("Cycle Differences: ");
+                for (int d : diffs) outputArea.append(d + " ");
+                outputArea.append("\n");
+            } else outputArea.append("Add period dates first.\n");
+        });
+
+        showStatsBtn.addActionListener(e -> {
+            if (cycleProcessor != null) {
+                outputArea.append("Average Difference: " + cycleProcessor.getAverageDifference() + "\n");
+                outputArea.append("Variance: " + cycleProcessor.getVariance() + "\n");
+            } else outputArea.append("Add period dates first.\n");
+        });
+
+        estimateNextBtn.addActionListener(e -> {
+            if (cycleProcessor != null) {
+                LocalDate next = cycleProcessor.estimateNextPeriod();
+                outputArea.append("Next Period Estimated: " + next + "\n");
+            } else outputArea.append("Add period dates first.\n");
+        });
+
+        tabs.addTab("Cycle Tracker", cyclePanel);
+
+        // ================= Mood Tracker Tab =================
+        JPanel moodPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+        moodField = new JTextField();
+        JButton addMoodBtn = new JButton("Add Mood");
+        JButton showMoodBtn = new JButton("Show Mood Records");
+
+        moodPanel.add(new JLabel("Mood:"));
+        moodPanel.add(moodField);
+        moodPanel.add(addMoodBtn);
+        moodPanel.add(showMoodBtn);
+
+        addMoodBtn.addActionListener(e -> {
+            String mood = moodField.getText().trim();
+            if (!mood.isEmpty()) {
+                moodMonitor.addMood(mood);
+                outputArea.append("Mood added: " + mood + "\n");
+            }
         });
 
         tabs.addTab("Mood Tracker", moodPanel);
@@ -172,6 +266,7 @@ public class CycleCareMainMenu extends JFrame {
         // ==========================================
         // SYMPTOM TRACKER TAB
         // ==========================================
+        // ================= Symptom Tracker Tab =================
         JPanel symptomPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         symptomField = new JTextField();
         severityField = new JTextField();
@@ -254,6 +349,28 @@ public class CycleCareMainMenu extends JFrame {
         // ==========================================
         // OUTPUT AREA
         // ==========================================
+            String name = symptomField.getText().trim();
+            try {
+                int severity = Integer.parseInt(severityField.getText().trim());
+                if (!name.isEmpty()) {
+                    symptomMonitor.addSymptom(name, severity);
+                    outputArea.append("Symptom added: " + name + " (Severity: " + severity + ")\n");
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid severity!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        showSymptomBtn.addActionListener(e -> {
+            symptomMonitor.displayRecords();
+            outputArea.append("Average Severity: " + symptomMonitor.calculateAverageSeverity() + "\n");
+
+
+        });
+
+        tabs.addTab("Symptom Tracker", symptomPanel);
+
+        // ================= Output Area =================
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
@@ -264,6 +381,10 @@ public class CycleCareMainMenu extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new CycleCareMainMenu().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            CycleCareMainMenu gui = new CycleCareMainMenu();
+            gui.setVisible(true);
+        });
     }
 }
 
