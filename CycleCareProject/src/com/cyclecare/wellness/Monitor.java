@@ -3,6 +3,7 @@ package com.cyclecare.wellness;
 import com.cyclecare.exceptions.InvalidInputException;
 import java.util.ArrayList;
 
+
 public abstract class Monitor<M> {
     protected ArrayList<M> list = new ArrayList<>();
 
