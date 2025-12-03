@@ -32,7 +32,7 @@ public class CycleCareMainMenu extends JFrame {
     public CycleCareMainMenu() {
 
         setTitle("CycleCare");
-        setSize(1000, 800);
+        setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -194,7 +194,7 @@ public class CycleCareMainMenu extends JFrame {
                 outputArea.append("Symptom added: " + name + " (Severity: " + severity + ")\n");
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid severity!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
